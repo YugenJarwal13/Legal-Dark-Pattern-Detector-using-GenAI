@@ -1,0 +1,30 @@
+# Core ML
+torch
+transformers
+peft
+trl
+accelerate
+bitsandbytes
+
+# Fine-tuning (Colab)
+unsloth
+datasets
+
+# RAG
+chromadb
+sentence-transformers
+
+# Data
+pandas
+numpy
+
+# Evaluation
+scikit-learn
+rouge-score
+
+# UI
+streamlit
+
+# Utils
+tqdm
+sqlite-utils
