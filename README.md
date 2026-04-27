@@ -13,7 +13,7 @@ We build a system that:
 1. Identifies whether a clause is **Predatory or Fair**
 2. Classifies the **type of dark pattern**
 3. Generates a **human-readable explanation**
-4. (Optionally) links to relevant **GDPR regulations**
+4. Links to relevant **GDPR regulations** using context-aware retrieval
 
 ---
 
@@ -35,11 +35,12 @@ We evaluate:
 
 > **Does fine-tuning + retrieval improve legal reasoning in LLMs compared to base prompting?**
 
-We compare four approaches:
-- Base Model
-- Prompt Engineering
-- Retrieval-Augmented Generation (RAG)
-- Fine-Tuned Model (QLoRA)
+We compare five distinct approaches across a Hybrid Inference Architecture:
+1. **Mistral Base** (Offline Lookup)
+2. **Mistral Fine-Tuned** (Offline Lookup)
+3. **Groq Base** (Live API Inference)
+4. **Groq Few-Shot** (Live API Inference)
+5. **Groq RAG** (Live API Inference with GDPR context)
 
 ---
 
@@ -54,13 +55,13 @@ Instruction-Response Dataset (JSONL)
 ↓
 Fine-Tuning (QLoRA in Colab)
 ↓
-Saved LoRA Adapter
+Saved LoRA Adapter Outputs
 ↓
 VS Code System
 ├── RAG (ChromaDB + GDPR)
-├── Inference (4 modes)
-├── SQLite Storage
-└── Evaluation + UI (Streamlit)
+├── Hybrid Inference Pipeline (Live Groq + Offline Mistral)
+├── Metrics Evaluator
+└── UI Dashboard (Streamlit)
 ```
 
 ---
@@ -79,14 +80,14 @@ Contains:
 
 ---
 
-## 🤖 Model
+## 🤖 Models Used
 
-Base Model:
+**Base & Fine-Tuned Models (Colab / Offline):**
 - Mistral-7B-Instruct
+- QLoRA (4-bit quantization) Fine-Tuning
 
-Fine-Tuning:
-- QLoRA (4-bit quantization)
-- Trained on instruction-response legal dataset
+**Live Inference Models (Groq):**
+- Fast LLM inference via Groq API (Zero-shot, Few-shot, RAG)
 
 ---
 
@@ -100,53 +101,37 @@ We use GDPR as external legal knowledge:
 - Article 17 – Right to erasure
 
 Stored in:
-- ChromaDB vector database
-
----
-
-## ⚙️ Inference Modes
-
-| Mode | Description |
-|------|------------|
-| Base | No prompt engineering |
-| Prompt | Few-shot prompting |
-| RAG | Adds GDPR context |
-| Fine-tuned | QLoRA + RAG |
+- **ChromaDB** vector database with Smart Re-Ranking logic.
 
 ---
 
 ## 📈 Evaluation Metrics
 
-### Quantitative:
-- Accuracy
-- Precision / Recall / F1-score
-- ROUGE-L (for explanation quality)
-- Citation Accuracy (approximate)
+### Classification:
+- Accuracy, Precision, Recall, F1-score
 
-### Qualitative:
-- Hallucination analysis
-- False positives
-- Explanation comparison
+### NLG Metrics:
+- BLEU, ROUGE (to measure textual similarity vs reasoning depth)
 
----
+### Reliability:
+- Hallucination count
+- Confidence scores
 
-## 💾 Data Storage
-
-- **ChromaDB** → GDPR retrieval
-- **SQLite** → audit history
+*Note: The system generates a comprehensive evaluation report in the `data/results/` folder, which is rendered dynamically in the dashboard.*
 
 ---
 
-## 🖥️ UI
+## 🖥️ UI Dashboard
 
 Built using:
-- Streamlit
+- **Streamlit**
 
 Features:
-- Input ToS clause
-- Select model mode
-- View structured JSON output
-- View past audit history
+- Input a ToS clause
+- View structured comparisons across all 5 models side-by-side
+- Distinct visual highlighting for context-aware RAG explanations
+- Offline fallback handling for non-live models
+- Live rendering of evaluation metrics (Accuracy, F1, Hallucinations)
 
 ---
 
@@ -155,15 +140,19 @@ Features:
 ```text
 project/
 ├── data/
+│   ├── gdpr.txt
+│   └── results/ (Evaluation CSVs)
 ├── notebooks/
-├── models/
 ├── src/
-│ ├── data_prep.py
-│ ├── rag.py
-│ ├── inference.py
-│ ├── evaluate.py
-│ └── storage.py
+│   ├── data_prep.py
+│   ├── rag.py
+│   ├── inference.py
+│   ├── pipeline.py
+│   ├── evaluate.py
+│   ├── colab_loader.py
+│   └── utils.py
 ├── app.py
+├── report.md / report.docx
 ├── requirements.txt
 └── README.md
 ```
@@ -176,42 +165,26 @@ project/
 - Dataset cleaning
 - Instruction dataset creation
 - Fine-tuning (QLoRA)
+- Export model inferences to CSV
 
 ### Phase 2 (VS Code):
 - RAG implementation
-- Inference system
-- Evaluation
-- UI
+- Hybrid inference system
+- Full Pipeline Evaluation
+- Interactive UI Dashboard
 
 ---
 
 ## 🧠 Key Contributions
 
-- Comparison of 4 LLM approaches
-- Demonstration of hallucination reduction using RAG
-- Improvement using parameter-efficient fine-tuning
-- Practical legal AI application
+- Comparison of 5 distinct LLM approaches
+- Demonstration of hallucination reduction using RAG (zero hallucinations)
+- Innovative hybrid inference architecture solving local compute limits
+- Comprehensive evaluation pipeline generating professional metrics reports
 
 ---
 
-## ⚠️ Limitations
-
-- No ground-truth legal statute mapping
-- Small dataset size
-- Simplified legal reasoning
-
----
-
-## 📌 Future Work
-
-- Larger datasets (CUAD, LegalBench)
-- Better legal grounding
-- Multi-document reasoning
-- Real-time browser extension
-
----
-
-## 🧑💻 Author
+## 🧑‍💻 Author
 
 Yugen Jarwal  
 B.Tech CSE  

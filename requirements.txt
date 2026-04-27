@@ -21,6 +21,8 @@ numpy
 # Evaluation
 scikit-learn
 rouge-score
+matplotlib
+seaborn
 
 # UI
 streamlit
@@ -28,3 +30,6 @@ streamlit
 # Utils
 tqdm
 sqlite-utils
+
+# API
+groq
